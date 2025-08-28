@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false, 
+    "paths": {
+      // "modules/*": ["./src/modules/*"],
+      // "core":["./src/core"],
+      // "core/*":["./src/core/*"],
+      // "user":["./src/modules/user"],
+      // "user/*":["./src/modules/user/*"],
+      // "auth":["./src/modules/auth"],
+      // "auth/*":["./src/modules/auth/*"],
+      // "shared":["./src/shared"],
+      // "shared/*":["./src/shared/*"]
+      "@prisma-client": ["./generated/prisma"]
+    }
+  }
+}
