@@ -11,6 +11,7 @@ import {JwtService} from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import {Request, Response} from 'express';
 import {getCookieOptions} from 'src/config/cookie.config';
+import {authErrors as e} from 'src/shared/consts/auth/errors';
 import {excludePassword} from 'src/shared/utils/exclude-password.util';
 import {isDev} from 'src/shared/utils/is-dev.util';
 import {ttlToMs} from 'src/shared/utils/ttl.utils';
@@ -44,13 +45,13 @@ export class AuthService {
 		const exists = await this.userService.checkUserExists(email);
 
 		if (exists) {
-			throw new ConflictException('Пользователь с таким email уже существует');
+			throw new ConflictException(e.service.signup.emailAlreadyExists);
 		}
 		const passwordHash = await this.hashPassword(password);
 		const user = await this.userService.createUser({username, password: passwordHash, email});
 
 		if (user.refreshTokenVersion === null || user.refreshTokenVersion === undefined) {
-			throw new InternalServerErrorException('Версия токена не определена');
+			throw new InternalServerErrorException(e.service.signup.tokenVersionUndefined);
 		}
 
 		const version = Number(user.refreshTokenVersion);
@@ -64,17 +65,17 @@ export class AuthService {
 		const user = await this.userService.findUserByEmail(email);
 
 		if (!user) {
-			throw new NotFoundException('Пользователь с таким email не найден');
+			throw new NotFoundException(e.service.signin.userNotFound);
 		}
 
 		const isPasswordCorrect = await this.verifyPassword(user.password, password);
 
 		if (!isPasswordCorrect) {
-			throw new NotFoundException('Пользователь с таким email не найден');
+			throw new NotFoundException(e.service.signin.userNotFound);
 		}
 
 		if (user.refreshTokenVersion === null || user.refreshTokenVersion === undefined) {
-			throw new InternalServerErrorException('Версия токена не определена');
+			throw new InternalServerErrorException(e.service.signin.tokenVersionUndefined);
 		}
 
 		const version = Number(user.refreshTokenVersion);
@@ -87,30 +88,28 @@ export class AuthService {
 		const payload: IPayload = await this.jwtService.verifyAsync(refreshToken);
 
 		if (!payload.id) {
-			throw new UnauthorizedException('Refresh токен утерян, необходима повторная авторизация');
+			throw new UnauthorizedException(e.service.refresh.tokenMissing);
 		}
 
-		if (payload.id) {
-			const user = await this.userService.findUserById(payload.id);
+		const user = await this.userService.findUserById(payload.id);
 
-			if (!user) {
-				throw new NotFoundException('Пользователь с таким email не найден');
-			}
-
-			if (user.refreshTokenVersion === null || user.refreshTokenVersion === undefined) {
-				throw new InternalServerErrorException('Версия токена не определена');
-			}
-
-			const version = Number(user.refreshTokenVersion);
-
-			if (payload.version !== user.refreshTokenVersion) {
-				throw new UnauthorizedException('Refresh токен утерян, необходима повторная авторизация');
-			}
-
-			const tokens = this.generateTokens(user.id, version);
-
-			return {user, tokens};
+		if (!user) {
+			throw new NotFoundException(e.service.refresh.userNotFound);
 		}
+
+		if (user.refreshTokenVersion === null || user.refreshTokenVersion === undefined) {
+			throw new InternalServerErrorException(e.service.refresh.tokenVersionUndefined);
+		}
+
+		const version = Number(user.refreshTokenVersion);
+
+		if (payload.version !== user.refreshTokenVersion) {
+			throw new UnauthorizedException(e.service.refresh.tokenVersionMismatch);
+		}
+
+		const tokens = this.generateTokens(user.id, version);
+
+		return {user, tokens};
 	}
 
 	async logout(userId: string) {
@@ -133,7 +132,7 @@ export class AuthService {
 	async validateUser(userId: string): Promise<UserWithoutPassword> {
 		const userInDb = await this.userService.findUserById(userId);
 		if (!userInDb) {
-			throw new NotFoundException('Пользователь с таким email не найден');
+			throw new NotFoundException(e.service.validateUser.userNotFound);
 		}
 		return excludePassword(userInDb);
 	}
@@ -148,7 +147,7 @@ export class AuthService {
 
 	private generateTokens(userId: string, version: number): Tokens {
 		if (!userId) {
-			throw new BadRequestException('Для генерации токена нужен Id пользователя');
+			throw new BadRequestException(e.service.generateTokens.userIdMissing);
 		}
 		const payload: IPayload = {id: userId, version};
 		const accessToken = this.jwtService.sign(payload, {expiresIn: this.JWT_ACCESS_TOKEN_TTL});

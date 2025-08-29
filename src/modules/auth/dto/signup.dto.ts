@@ -1,51 +1,48 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsEmail, IsNotEmpty, IsString, Length, Matches, MinLength} from 'class-validator';
-import {v} from 'src/shared/consts/dto.const';
+import {authErrors as e} from 'src/shared/consts/auth/errors';
+import {authValidation as v} from 'src/shared/consts/auth/validation';
 
 export class SignupDto {
-	@IsString({message: 'Поле должно быть строкой'})
-	@IsNotEmpty({message: 'Поле не может быть пустым'})
-	@IsEmail({}, {message: 'Некорректный формат почты'})
-	@Length(v.auth.signup.email.min, v.auth.signup.email.max, {
-		message: `Почта должна быть от ${v.auth.signup.email.min} до ${v.auth.signup.email.max} символов`,
+	@IsString({message: e.dto.signup.emailNotString})
+	@IsNotEmpty({message: e.dto.signup.emailEmpty})
+	@IsEmail({}, {message: e.dto.signup.invalidEmailFormat})
+	@Length(v.signup.email.min, v.signup.email.max, {
+		message: e.dto.signup.emailLength(v.signup.email.min, v.signup.email.max),
 	})
 	@ApiProperty({
 		type: 'string',
 		description: 'Почта пользователя',
 		example: 'username@example.com',
-		maxLength: v.auth.signup.email.max,
-		minLength: v.auth.signup.email.min,
+		maxLength: v.signup.email.max,
+		minLength: v.signup.email.min,
 	})
 	email: string;
 
-	@IsString({message: 'Поле должно быть строкой'})
-	@IsNotEmpty({message: 'Поле не может быть пустым'})
-	@Length(v.auth.signup.username.min, v.auth.signup.username.max, {
-		message: `Имя пользователя должно быть от ${v.auth.signup.username.min} до ${v.auth.signup.username.max} символов`,
+	@IsString({message: e.dto.signup.usernameNotString})
+	@IsNotEmpty({message: e.dto.signup.usernameEmpty})
+	@Length(v.signup.username.min, v.signup.username.max, {
+		message: e.dto.signup.usernameLength(v.signup.username.min, v.signup.username.max),
 	})
-	@Matches(v.auth.signup.username.pattern, {
-		message: 'Имя пользователя может содержать латинские буквы, цифры и специальные символы',
-	})
+	@Matches(v.signup.username.pattern, {message: e.dto.signup.usernamePattern})
 	@ApiProperty({
 		type: 'string',
 		description: 'Имя пользователя',
 		example: 'Username',
-		maxLength: v.auth.signup.username.max,
-		minLength: v.auth.signup.username.min,
-		pattern: v.auth.signup.username.pattern.source,
+		maxLength: v.signup.username.max,
+		minLength: v.signup.username.min,
+		pattern: v.signup.username.pattern.source,
 	})
 	username: string;
 
-	@IsString({message: 'Поле должно быть строкой'})
-	@IsNotEmpty({message: 'Поле не может быть пустым'})
-	@MinLength(v.auth.signup.password.min, {
-		message: `Пароль должен быть не менее ${v.auth.signup.password.min} символов`,
-	})
+	@IsString({message: e.dto.signup.passwordNotString})
+	@IsNotEmpty({message: e.dto.signup.passwordEmpty})
+	@MinLength(v.signup.password.min, {message: e.dto.signup.passwordMinLength(v.signup.password.min)})
 	@ApiProperty({
 		type: 'string',
 		description: 'Пароль пользователя',
 		example: 'password',
-		minLength: v.auth.signup.password.min,
+		minLength: v.signup.password.min,
 	})
 	password: string;
 }

@@ -1,0 +1,16 @@
+module.exports = {
+	moduleFileExtensions: ['js', 'json', 'ts'],
+	rootDir: '../../src/',
+	testRegex: '.*\\.(spec|e2e-spec)\\.ts$', // Оба типа тестов
+	transform: {
+		'^.+\\.(t|j)s$': 'ts-jest',
+	},
+	collectCoverageFrom: ['**/*.(t|j)s'],
+	coverageDirectory: '../coverage',
+	testEnvironment: 'node',
+	moduleNameMapper: {
+		'^src/(.*)$': '<rootDir>/$1',
+		'^@shared/(.*)$': '<rootDir>/shared/$1',
+		'^@prisma-client$': '<rootDir>/../generated/prisma',
+	},
+};

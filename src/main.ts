@@ -4,11 +4,13 @@ import {NestFactory} from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 
 import {AppModule} from './app.module';
+import {getValidationPipeConfig} from './config/validation-pipe.config';
 import {CustomExceptionFilter} from './shared/filters/exсeption.filter';
 import {LoggingInterceptor} from './shared/interceptors/logging.interceptor';
 import {CustomLogger} from './shared/services/logger.service';
 import {isDev} from './shared/utils/is-dev.util';
 import {setupSwagger} from './shared/utils/swagger.utils';
+import { getCorsConfig } from './config/cors.config';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {bufferLogs: true});
@@ -23,17 +25,11 @@ async function bootstrap() {
 	app.setGlobalPrefix('api');
 	app.enableVersioning({type: VersioningType.URI, defaultVersion: '1'});
 
-	app.useGlobalPipes(new ValidationPipe({whitelist: true, forbidNonWhitelisted: true}));
+	app.useGlobalPipes(new ValidationPipe(getValidationPipeConfig()));
 	app.useGlobalFilters(new CustomExceptionFilter(logger));
 	app.useGlobalInterceptors(new LoggingInterceptor(logger));
 
-	app.enableCors({
-		origin: configService.getOrThrow<string>('ALLOWED_ORIGINS').split(','),
-		credentials: true,
-		methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-		exposedHeaders: ['set-cookie'],
-		allowedHeaders: ['content-type', 'authorization'],
-	});
+	app.enableCors(getCorsConfig(configService));
 
 	app.use(cookieParser([configService.getOrThrow<string>('JWT_SECRET')]));
 

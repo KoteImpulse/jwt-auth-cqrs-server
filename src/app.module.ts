@@ -9,6 +9,7 @@ import {PrismaModule} from './core/prisma/prisma.module';
 import {AuthModule} from './modules/auth/auth.module';
 import {UserModule} from './modules/user/user.module';
 import {LogsCleanupService} from './shared/services/logs-cleanup.service';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import {LogsCleanupService} from './shared/services/logs-cleanup.service';
 		PrismaModule,
 		AuthModule,
 		UserModule,
+		EmailModule,
 	],
 	controllers: [AppController],
 	providers: [AppService, LogsCleanupService],
