@@ -5,7 +5,7 @@ import {Test, TestingModule} from '@nestjs/testing';
 import type {Request, Response} from 'express';
 import {authErrors as e} from 'src/shared/consts/auth/errors';
 import {authFixtures} from 'src/shared/tests/fixtures';
-import {mockAuthService, mockCommandBus, mockRequest, mockResponse, mockUserId} from 'src/shared/tests/mocks';
+import {authMocks} from 'src/shared/tests/mocks';
 
 import {AuthController} from '../auth.controller';
 import {AuthService} from '../auth.service';
@@ -18,6 +18,7 @@ describe('AuthController', () => {
 	let request: jest.Mocked<Request>;
 
 	const {mockTokens, mockSigninDto, mockSignupDto, mockUserWithoutPassword} = authFixtures;
+	const {mockAuthService, mockCommandBus, mockRequest, mockResponse, mockUserId} = authMocks;
 
 	beforeEach(async () => {
 		jest.clearAllMocks();
@@ -30,7 +31,7 @@ describe('AuthController', () => {
 			],
 		}).compile();
 
-		authController = module.get<AuthController>(AuthController);
+		authController = module.get(AuthController);
 		authService = module.get(AuthService);
 		commandBus = module.get(CommandBus);
 		response = mockResponse as unknown as jest.Mocked<Response>;
@@ -44,7 +45,7 @@ describe('AuthController', () => {
 	}
 
 	describe('', () => {
-		it('AuthController должен определиться', () => {
+		it('AuthController должен быть определен', () => {
 			expect(authController).toBeDefined();
 		});
 	});
@@ -71,6 +72,11 @@ describe('AuthController', () => {
 			await expect(authController.signup(mockSignupDto, response)).rejects.toThrow(
 				e.service.signup.tokenVersionUndefined,
 			);
+			expectCommandCalledOnceAndNoCookie({signupDto: mockSignupDto});
+		});
+		it('Должен вызвать команду signup и выбросить InternalServerErrorException если пользователь не создался', async () => {
+			commandBus.execute.mockRejectedValue(new InternalServerErrorException(e.service.signup.userNotCreated));
+			await expect(authController.signup(mockSignupDto, response)).rejects.toThrow(e.service.signup.userNotCreated);
 			expectCommandCalledOnceAndNoCookie({signupDto: mockSignupDto});
 		});
 	});

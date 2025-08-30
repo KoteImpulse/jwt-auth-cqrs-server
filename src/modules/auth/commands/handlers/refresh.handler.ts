@@ -11,7 +11,7 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand, CommandEx
 
 	async execute(command: RefreshCommand): Promise<CommandExecuteResult> {
 		const refreshToken = command.refreshToken;
-		const {tokens, user} = await this.authService.refresh(refreshToken);
+		const {user, tokens} = await this.authService.refresh(refreshToken);
 		const userWithoutPassword = excludePassword(user);
 		return {user: userWithoutPassword, tokens};
 	}

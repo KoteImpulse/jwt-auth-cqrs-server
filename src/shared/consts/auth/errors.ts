@@ -3,6 +3,7 @@ export const authErrors = {
 		signup: {
 			emailAlreadyExists: 'Пользователь с таким email уже существует',
 			tokenVersionUndefined: 'Версия токена не определена',
+			userNotCreated: 'Ошибка создания пользователя',
 		},
 		signin: {
 			userNotFound: 'Пользователь с таким email не найден',
@@ -20,9 +21,8 @@ export const authErrors = {
 		validateUser: {
 			userNotFound: 'Пользователь с таким email не найден',
 		},
-		logout: {
-			invalidToken: 'Access токен недействителен',
-		},
+		invalidBearerToken: 'Access токен недействителен',
+		logout: {},
 	},
 
 	dto: {

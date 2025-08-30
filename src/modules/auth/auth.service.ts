@@ -50,6 +50,10 @@ export class AuthService {
 		const passwordHash = await this.hashPassword(password);
 		const user = await this.userService.createUser({username, password: passwordHash, email});
 
+		if (!user) {
+			throw new InternalServerErrorException(e.service.signup.userNotCreated);
+		}
+
 		if (user.refreshTokenVersion === null || user.refreshTokenVersion === undefined) {
 			throw new InternalServerErrorException(e.service.signup.tokenVersionUndefined);
 		}
@@ -101,18 +105,17 @@ export class AuthService {
 			throw new InternalServerErrorException(e.service.refresh.tokenVersionUndefined);
 		}
 
-		const version = Number(user.refreshTokenVersion);
-
 		if (payload.version !== user.refreshTokenVersion) {
 			throw new UnauthorizedException(e.service.refresh.tokenVersionMismatch);
 		}
 
+		const version = Number(user.refreshTokenVersion);
 		const tokens = this.generateTokens(user.id, version);
 
 		return {user, tokens};
 	}
 
-	async logout(userId: string) {
+	async logout(userId: string): Promise<void> {
 		await this.userService.incrementRefreshTokenVersion(userId);
 	}
 
@@ -137,9 +140,9 @@ export class AuthService {
 		return excludePassword(userInDb);
 	}
 
-	extractRefreshToken(req: Request): string | null {
+	public extractRefreshToken(req: Request): string | null {
 		if (req.cookies['refreshToken']) return req.cookies['refreshToken'] as string;
-		const header = req.headers['refreshtoken'];
+		const header = req.headers['refreshtoken'] || req.headers['refreshToken'];
 		if (Array.isArray(header)) return header[0];
 		if (typeof header === 'string') return header;
 		return null;

@@ -13,7 +13,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 		status?: any,
 	): TUser {
 		if (err || !user) {
-			throw new UnauthorizedException(e.service.logout.invalidToken);
+			throw new UnauthorizedException(e.service.invalidBearerToken);
 		}
 		return user;
 	}

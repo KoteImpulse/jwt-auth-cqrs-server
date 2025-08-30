@@ -27,6 +27,7 @@ export class AuthController {
 	@ApiOperation({description: 'Создание нового аккаунта пользователя', summary: 'Создание аккаунта'})
 	@ApiResponse({status: HttpStatus.CREATED, description: 'Аккаунт успешно создан', type: ResponseDto})
 	@ApiResponse({status: HttpStatus.CONFLICT, description: e.service.signup.emailAlreadyExists})
+	@ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: e.service.signup.userNotCreated})
 	@ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: e.service.signup.tokenVersionUndefined})
 	@HttpCode(HttpStatus.CREATED)
 	@Post('signup')
@@ -77,7 +78,7 @@ export class AuthController {
 
 	@ApiOperation({summary: 'Выход из системы'})
 	@ApiResponse({status: HttpStatus.NO_CONTENT, description: 'Успешный выход из системы'})
-	@ApiResponse({status: HttpStatus.UNAUTHORIZED, description: e.service.logout.invalidToken})
+	@ApiResponse({status: HttpStatus.UNAUTHORIZED, description: e.service.invalidBearerToken})
 	@ApiResponse({status: HttpStatus.NOT_FOUND, description: e.service.validateUser.userNotFound})
 	@ApiBearerAuth()
 	@HttpCode(HttpStatus.NO_CONTENT)

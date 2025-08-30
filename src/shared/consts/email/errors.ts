@@ -1,0 +1,9 @@
+export const emailErrors = {
+	service: {
+		sendEmail: {
+			emailAlreadyExists: 'Пользователь с таким email уже существует',
+			tokenVersionUndefined: 'Версия токена не определена',
+			userNotFound: 'Пользователь с таким email не найден',
+		},
+	},
+};

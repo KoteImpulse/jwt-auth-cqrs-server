@@ -1,7 +1,8 @@
-import { Controller } from '@nestjs/common';
-import { EmailService } from './email.service';
+import {Controller} from '@nestjs/common';
 
-@Controller('email')
+import {EmailService} from './email.service';
+
+@Controller({path: 'email', version: '1'})
 export class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+	constructor(private readonly emailService: EmailService) {}
 }

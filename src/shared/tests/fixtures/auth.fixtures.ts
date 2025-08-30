@@ -1,7 +1,7 @@
 import {User} from '@prisma-client';
 import {SigninDto} from 'src/modules/auth/dto/signin.dto';
 import {SignupDto} from 'src/modules/auth/dto/signup.dto';
-import {Tokens} from 'src/modules/auth/types/auth.type';
+import {IPayload, Tokens} from 'src/modules/auth/types/auth.type';
 import {UserWithoutPassword} from 'src/modules/user/types/user.type';
 
 const mockDate = new Date('2025-01-29T12:00:00.000Z');
@@ -22,6 +22,11 @@ const mockUser: User = {
 	password: 'password',
 };
 
+const mockPayload: IPayload = {
+	id: mockUser.id,
+	version: mockUser.refreshTokenVersion,
+};
+
 const mockSignupDto: SignupDto = {
 	username: 'userName',
 	password: 'password',
@@ -40,4 +45,5 @@ export const authFixtures = {
 	mockUser,
 	mockSignupDto,
 	mockSigninDto,
+	mockPayload
 };
