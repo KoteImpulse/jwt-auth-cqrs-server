@@ -7,13 +7,13 @@ import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {PrismaModule} from './core/prisma/prisma.module';
 import {AuthModule} from './modules/auth/auth.module';
+import {EmailModule} from './modules/email/email.module';
 import {UserModule} from './modules/user/user.module';
 import {LogsCleanupService} from './shared/services/logs-cleanup.service';
-import { EmailModule } from './modules/email/email.module';
 
 @Module({
 	imports: [
-		ConfigModule.forRoot({isGlobal: true}),
+		ConfigModule.forRoot({isGlobal: true, envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env'}),
 		ScheduleModule.forRoot(),
 		CqrsModule.forRoot(),
 		PrismaModule,
