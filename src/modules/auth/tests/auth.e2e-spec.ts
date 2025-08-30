@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {INestApplication, ValidationPipe, VersioningType} from '@nestjs/common';
 import {Test} from '@nestjs/testing';
 import * as request from 'supertest';
 
-import {prisma, setupTestDatabase, teardownTestDatabase} from '../../../shared/utils/test-utils';
 import {AppModule} from '../../../app.module';
+import {prisma, setupTestDatabase, teardownTestDatabase} from '../../../shared/utils/test-utils';
 
 describe('AuthController (e2e)', () => {
 	let app: INestApplication;
@@ -13,13 +12,13 @@ describe('AuthController (e2e)', () => {
 	beforeAll(async () => {
 		await setupTestDatabase();
 
-		const moduleRef = await Test.createTestingModule({
+		const module = await Test.createTestingModule({
 			imports: [AppModule],
 		}).compile();
 
-		app = moduleRef.createNestApplication();
-		app.setGlobalPrefix('api'); // глобальный префикс
-		app.enableVersioning({type: VersioningType.URI}); // versioning включен
+		app = module.createNestApplication();
+		app.setGlobalPrefix('api');
+		app.enableVersioning({type: VersioningType.URI});
 		app.useGlobalPipes(new ValidationPipe({whitelist: true}));
 		await app.init();
 	});
@@ -38,20 +37,14 @@ describe('AuthController (e2e)', () => {
 				password: '123456',
 			};
 
-			const response = await request(app.getHttpServer())
-				.post('/api/v1/auth/signup') // учитываем prefix + version
-				.send(signupData)
-				.expect(201);
+			const response = await request(app.getHttpServer()).post('/api/v1/auth/signup').send(signupData).expect(201);
 
-			// проверяем тело ответа
 			expect(response.body.user).toBeDefined();
 			expect(response.body.user.email).toBe(signupData.email);
 			expect(response.body.accessToken).toBeDefined();
 
-			// проверяем refreshToken в куки
 			const cookies = response.headers['set-cookie'];
 			expect(cookies).toBeDefined();
-			// expect(cookies.some((c: string) => c.includes('refreshToken'))).toBeTruthy();
 		});
 	});
 });
