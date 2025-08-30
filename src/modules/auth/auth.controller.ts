@@ -4,13 +4,14 @@ import {ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags} from '
 import type {Request, Response} from 'express';
 import {authErrors as e} from 'src/shared/consts/auth/errors';
 
+import {CurrentUser} from '../../shared/decorators/current-user.decorator';
+
 import {AuthService} from './auth.service';
 import {LogoutCommand} from './commands/implementation/logout.command';
 import {RefreshCommand} from './commands/implementation/refresh.command';
 import {SigninCommand} from './commands/implementation/singin.command';
 import {SignupCommand} from './commands/implementation/singup.command';
 import {AuthDecorator} from './decorators/auth.decorator';
-import {Authorized} from './decorators/authorized.decorator';
 import {ResponseDto} from './dto/response.dto';
 import {SigninDto} from './dto/signin.dto';
 import {SignupDto} from './dto/signup.dto';
@@ -84,7 +85,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@AuthDecorator()
 	@Post('logout')
-	async logout(@Authorized('id') userId: string, @Res({passthrough: true}) response: Response): Promise<void> {
+	async logout(@CurrentUser('id') userId: string, @Res({passthrough: true}) response: Response): Promise<void> {
 		await this.commandBus.execute<LogoutCommand, void>(new LogoutCommand(userId));
 		this.authService.clearRefreshCookie(response);
 	}

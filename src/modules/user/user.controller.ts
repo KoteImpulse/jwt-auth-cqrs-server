@@ -4,8 +4,8 @@ import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger
 import {authErrors} from 'src/shared/consts/auth/errors';
 import {userErrors as e} from 'src/shared/consts/user/errors';
 
+import {CurrentUser} from '../../shared/decorators/current-user.decorator';
 import {AuthDecorator} from '../auth/decorators/auth.decorator';
-import {Authorized} from '../auth/decorators/authorized.decorator';
 
 import {UserWithoutPasswordDto} from './dto/user.dto';
 import {GetProfileQuery} from './queries/implementation/get-profile.query';
@@ -29,7 +29,7 @@ export class UserController {
 	@ApiBearerAuth('bearer')
 	@AuthDecorator()
 	@Get('profile')
-	async getProfile(@Authorized('id') userId: string) {
+	async getProfile(@CurrentUser('id') userId: string) {
 		return this.queryBus.execute(new GetProfileQuery(userId));
 	}
 }
