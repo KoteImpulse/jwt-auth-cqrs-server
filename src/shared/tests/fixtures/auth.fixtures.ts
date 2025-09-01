@@ -29,8 +29,8 @@ const mockPayload: IPayload = {
 
 const mockSignupDto: SignupDto = {
 	username: 'userName',
-	password: 'password',
 	email: 'email@email.email',
+	password: 'password',
 };
 
 const mockSigninDto: SigninDto = {
@@ -45,5 +45,5 @@ export const authFixtures = {
 	mockUser,
 	mockSignupDto,
 	mockSigninDto,
-	mockPayload
+	mockPayload,
 };
